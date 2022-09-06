@@ -1,6 +1,5 @@
-import fitz, csv, re, os, glob
+import re, os, glob, sys
 import pandas as pd
-import numpy as np
 
 def get_ident(file):
     a={}
@@ -86,12 +85,17 @@ params=[
 
 if __name__ == "__main__":
 
-    path = os.getcwd()
+    if sys.argv:
+        path=os.path.abspath(sys.argv[1])
+    else:
+        path = os.getcwd()
+    
+
     for pdf in glob.glob(f"{path}/*.pdf"):
         os.system(f"python -m fitz gettext {pdf}")
     
     for txt in glob.glob(f"{path}/*.txt"):
-        fname=txt.split("\\")[-1].split(".")[0]
+        orig_fname=txt.split("\\")[-1].split(".")[0]
         df = pd.read_fwf(txt)
         # print(df)
         result={}
@@ -99,5 +103,8 @@ if __name__ == "__main__":
         for param in params:
             result.update(get_lab_param(df, param))
 
+        output_fname=result["Patient_ID"]
         labs=pd.DataFrame(result, index=[0])
-        labs.to_excel(f"{fname}.xlsx")
+        labs.to_excel(f"{path}/{output_fname}.xlsx")
+
+        os.system(f"erase {path}\{orig_fname}.txt")
