@@ -20,15 +20,16 @@ def get_ident(file):
         adm_date=re.findall(adm_date_pattern, text)[0]
         adm_date=adm_date.split()[2]
 
+        a["Patient_ID"]=taj
+        a["DOB"]=dob
+        a["Admission_date"]=adm_date
+        
         try:
             sex=re.findall(sex_pattern, text)[0]
             a["Sex"]="female"
         except IndexError:
             a["Sex"]="male"
 
-        a["Patient_ID"]=taj
-        a["DOB"]=dob
-        a["Admission_date"]=adm_date
     return a
 
 def get_lab_param(file, lab_param):
