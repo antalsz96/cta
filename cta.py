@@ -10,6 +10,8 @@ def get_ident(file):
         dob_pattern=r'Szül.dátum:\s+\d{4}.\d{2}.\d{2}'
         adm_date_pattern=r'Felvételi dátum.:\s+\d{4}.\d{2}.\d{2}'
         sex_pattern=r'Születési név...:\s\S+'
+        bno_pattern=r'[A-Z]\d{2,}[A-Z]?\d*'
+        beav_pattern=r' \d{5} '
 
         taj=re.findall(taj_pattern, text)
         taj=taj[0].replace("-","")
@@ -20,16 +22,29 @@ def get_ident(file):
         adm_date=re.findall(adm_date_pattern, text)[0]
         adm_date=adm_date.split()[2]
 
+        bno_list=re.findall(bno_pattern, text)
+
+        beav_list=re.findall(beav_pattern, text)
+        for i in range(len(beav_list)):
+            new_item=beav_list[i].replace(" ","")
+            beav_list[i]=new_item
+                    
         a["Patient_ID"]=taj
         a["DOB"]=dob
         a["Admission_date"]=adm_date
-        
         try:
             sex=re.findall(sex_pattern, text)[0]
             a["Sex"]="female"
         except IndexError:
             a["Sex"]="male"
 
+        if "I48H0" not in bno_list:
+            a["AF"]="no"
+        else:
+            a["AF"]="known/recent"
+
+        if "06042" in beav_list:
+            a["Alteplase"]="yes"
     return a
 
 def get_lab_param(file, lab_param):
