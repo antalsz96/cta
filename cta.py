@@ -11,6 +11,8 @@ def get_ident(file):
         sex_pattern=r'Születési név...:\s\S+'
         bno_pattern=r'[A-Z]\d{2,}[A-Z]?\d*'
         beav_pattern=r' \d{5} '
+        nihss_pattern=r'NI?HSS: \d+'
+        mrs_pattern=r'mRS: \d+'
 
         taj=re.findall(taj_pattern, text)
         taj=taj[0].replace("-","")
@@ -28,6 +30,18 @@ def get_ident(file):
             new_item=beav_list[i].replace(" ","")
             beav_list[i]=new_item
                     
+        try:
+            nihss=re.findall(nihss_pattern, text)[0]
+            nihss=nihss.split()[1]
+        except IndexError:
+            nihss=None
+
+        try:
+            mrs=re.findall(mrs_pattern, text)[0]
+            mrs=mrs.split()[1]
+        except IndexError:
+            mrs=None
+
         a["Patient_ID"]=taj
         a["DOB"]=dob
         a["Admission_date"]=adm_date
@@ -44,6 +58,10 @@ def get_ident(file):
 
         if "06042" in beav_list:
             a["Alteplase"]="yes"
+
+        a["NIHSS"]=nihss
+        a["mRS"]=mrs
+
     return a
 
 def get_lab_param(file, lab_param):
@@ -85,7 +103,7 @@ params=[
 
 if __name__ == "__main__":
 
-    if sys.argv:
+    if len(sys.argv)>1:
         path=os.path.abspath(sys.argv[1])
     else:
         path = os.getcwd()
