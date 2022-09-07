@@ -192,4 +192,5 @@ if __name__ == "__main__":
         labs=pd.DataFrame(result, index=[0])
         labs.to_excel(f"{path}/{output_fname}.xlsx")
 
+        os.system(f"ren {path}\{orig_fname}.pdf {output_fname}.pdf")
         os.system(f"erase {path}\{orig_fname}.txt")
