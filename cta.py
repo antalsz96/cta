@@ -13,6 +13,8 @@ def get_ident(file):
         beav_pattern=r' \d{5} '
         nihss_pattern=r'NI?HSS: \d+'
         mrs_pattern=r'mRS: \d+'
+        rr_pattern=r'RR:\s*\d+/\d+'
+        pulse_pattern=r'P:\s*\d+'
 
         taj=re.findall(taj_pattern, text)
         taj=taj[0].replace("-","")
@@ -42,6 +44,18 @@ def get_ident(file):
         except IndexError:
             mrs=None
 
+        try:
+            rr=re.findall(rr_pattern, text)[0]
+            rr=rr.split()[1]
+        except IndexError:
+            rr=None
+
+        try:
+            pulse=re.findall(pulse_pattern, text)[0]
+            pulse=pulse.split()[1]
+        except IndexError:
+            pulse=None
+
         a["Patient_ID"]=taj
         a["DOB"]=dob
         a["Admission_date"]=adm_date
@@ -58,7 +72,14 @@ def get_ident(file):
 
         if "06042" in beav_list:
             a["Alteplase"]="yes"
+        
+        if "I10H0" in bno_list:
+            a["HT"]="yes"
 
+        if rr:
+            a["RR sys"]=rr.split("/")[0]
+            a["RR dia"]=rr.split("/")[1]
+        a["P"]=pulse
         a["NIHSS"]=nihss
         a["mRS"]=mrs
 
@@ -78,10 +99,55 @@ def get_lab_param(file, lab_param):
             except IndexError: pass
             # return {i:p}
             # a["no"]=i
-            # if "Tromboplasztin" in par:
-            #     val=p[0].split(" ")[3]
+            if "Tromboplasztin" in par:
+                try:
+                    # val=p[0].split(" ")[3]
+                    vals=re.findall(r'\d*[,.]?\d*', par)
+                    for i in vals:
+                        if i != "":
+                            val=i
+                except IndexError: pass
             a[par]=val
             
+    return a
+
+def get_echo(file):
+    regs=[
+        r"Echo\w+\s?\(?\d{4}\.?\d{2}?\.?\d{2}?\.?.*",
+        r"Ao\w*:?\s+\d*-?\d*-?\d*-?",
+        r"B\w+\s?\w*:\s+\d+\s*\w+",
+        r"EDD:\s+\d+",
+        r"ESD:\s+\d+",
+        r"EDV:\s+\d+",
+        r"ESV:\s+\d+",
+        r"EF:\s+\d+",
+        r"IVS:\s+\d+",
+        r"PW:\s+\d+",
+        r"TAPSE:\s+\d+",
+        r"E/?A: \d+/\d+"
+    ]
+    a={}
+    for reg in regs:
+        with open(file, encoding="utf8") as f:
+            text=f.read()
+            try:
+                match=re.findall(reg, text)[0]
+                # print(match)
+
+                dates=re.findall(r'\d{4}\.?\d{2}?\.?\d{2}?',match)
+                if dates:
+                    a["date"]=dates[0]
+
+                # if "Ao" in match:
+                #     a["Aorta"]=re.split(r'\s+', match)[1]
+
+                if not "Echo" in match:
+                    par=match.split(":")[0]
+                    val=match.split(" ")[-1]
+                    a[par]=val
+            except IndexError:
+                pass
+
     return a
 
 params=[
@@ -118,6 +184,7 @@ if __name__ == "__main__":
         # print(df)
         result={}
         result.update(get_ident(txt))
+        result.update(get_echo(txt))
         for param in params:
             result.update(get_lab_param(df, param))
 
