@@ -6,7 +6,7 @@ def get_ident(file):
     with open(file, encoding="utf8") as f:
         text=f.read()
         taj_pattern=r'\d{3}-\d{3}-\d{3}'
-        dob_pattern=r'Szül.dátum:\s+\d{4}.\d{2}.\d{2}'
+        dob_pattern=r'(Szül.dátum|Születési dátum)\.*:\s*\d{4}.\d{2}.\d{2}'
         adm_date_pattern=r'Felvételi dátum.:\s+\d{4}.\d{2}.\d{2}'
         sex_pattern=r'Születési név...:\s\S+'
         bno_pattern=r'[A-Z]\d{2,}[A-Z]?\d*'
@@ -19,8 +19,11 @@ def get_ident(file):
         taj=re.findall(taj_pattern, text)
         taj=taj[0].replace("-","")
         
-        dob=re.findall(dob_pattern, text)[0]
-        dob=dob.split()[1]
+        try:
+            dob=re.findall(dob_pattern, text)[0]
+            dob=dob.split()[1]
+        except IndexError:
+            dob=None
 
         adm_date=re.findall(adm_date_pattern, text)[0]
         adm_date=adm_date.split()[2]
@@ -107,7 +110,7 @@ def get_lab_param(file, lab_param):
                         if i != "":
                             val=i
                 except IndexError: pass
-            a[par]=val
+            a[f"{i}_{par}"]=val
             
     return a
 
