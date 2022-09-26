@@ -4,3 +4,10 @@
 *.xlsx
 *.xml
 *.zip
+./test
+./medsol
+*.cer
+*.crt
+*.pem
+*.exe
+*.jpg

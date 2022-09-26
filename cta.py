@@ -6,8 +6,9 @@ def get_ident(file):
     with open(file, encoding="utf8") as f:
         text=f.read()
         taj_pattern=r'\d{3}-\d{3}-\d{3}'
-        dob_pattern=r'(Szül.dátum|Születési dátum)\.*:\s*\d{4}.\d{2}.\d{2}'
-        adm_date_pattern=r'Felvételi dátum.:\s+\d{4}.\d{2}.\d{2}'
+        dob_pattern=r'Születési dátum\.*:\s*\d{4}\.\d{2}\.\d{2}'
+        dob_pattern2=r'Szül.dátum:\s*\d{4}\.\d{2}\.\d{2}'
+        adm_date_pattern=r'Felvételi dátum\.*:\s+\d{4}.\d{2}.\d{2}'
         sex_pattern=r'Születési név...:\s\S+'
         bno_pattern=r'[A-Z]\d{2,}[A-Z]?\d*'
         beav_pattern=r' \d{5} '
@@ -21,12 +22,21 @@ def get_ident(file):
         
         try:
             dob=re.findall(dob_pattern, text)[0]
-            dob=dob.split()[1]
+            # print(dob)
+            dob=dob.split(":")[1]
         except IndexError:
-            dob=None
+            try:
+                dob=re.findall(dob_pattern2, text)[0]
+                # print(dob)
+                dob=dob.split(":")[1]
+            except IndexError:
+                dob=None
 
-        adm_date=re.findall(adm_date_pattern, text)[0]
-        adm_date=adm_date.split()[2]
+        try:
+            adm_date=re.findall(adm_date_pattern, text)[0]
+            adm_date=adm_date.split(":")[1]
+        except IndexError:
+            adm_date=None
 
         bno_list=re.findall(bno_pattern, text)
 
@@ -163,7 +173,7 @@ params=[
 "eGFR-EPI  ",
 "Fehérvérsejt szám",
 "Protrombin INR",
-"Akt.Parciális Tromboplasztin Idõ",
+"Akt.Parciális Tromboplasztin",
 "Kvantitatív D-dimer",
 "Haemoglobin A1C",
 "Triglicerid",
@@ -197,3 +207,4 @@ if __name__ == "__main__":
 
         os.system(f"ren {path}\{orig_fname}.pdf {output_fname}.pdf")
         os.system(f"erase {path}\{orig_fname}.txt")
+        
