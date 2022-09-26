@@ -208,3 +208,4 @@ if __name__ == "__main__":
         os.system(f"ren {path}\{orig_fname}.pdf {output_fname}.pdf")
         os.system(f"erase {path}\{orig_fname}.txt")
         
+        
