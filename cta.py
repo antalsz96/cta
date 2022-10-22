@@ -189,7 +189,7 @@ if __name__ == "__main__":
     
 
     for pdf in glob.glob(f"{path}/*.pdf"):
-        os.system(f"python -m fitz gettext {pdf}")
+        os.system(f"python3 -m fitz gettext {pdf}")
     
     for txt in glob.glob(f"{path}/*.txt"):
         orig_fname=txt.split("\\")[-1].split(".")[0]
@@ -205,7 +205,11 @@ if __name__ == "__main__":
         labs=pd.DataFrame(result, index=[0])
         labs.to_excel(f"{path}/{output_fname}.xlsx")
 
-        os.system(f"ren {path}\{orig_fname}.pdf {output_fname}.pdf")
-        os.system(f"erase {path}\{orig_fname}.txt")
+        if os.name == 'posix':
+            os.system(f"cp {path}/{orig_fname}.pdf {output_fname}.pdf")
+            os.system(f"rm {path}/{orig_fname}.txt")
+        else:
+            os.system(f"ren {path}\{orig_fname}.pdf {output_fname}.pdf")
+            os.system(f"erase {path}\{orig_fname}.txt")
         
         
