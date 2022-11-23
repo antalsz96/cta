@@ -11,6 +11,8 @@
 *.jpg
 test
 medsol
+patients
+echok
 *.docx
 *.ods
 *.png
