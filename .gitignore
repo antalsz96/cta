@@ -13,6 +13,10 @@ test
 medsol
 patients
 echok
+echo
+matlab
 *.docx
 *.ods
 *.png
+*.eps
+.DS_Store
