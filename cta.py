@@ -109,7 +109,8 @@ def get_lab_param(file, lab_param):
             par=p[0]
             try:
                 val=p[1]
-            except IndexError: pass
+            except IndexError: 
+                val=None
             # return {i:p}
             # a["no"]=i
             if "Tromboplasztin" in par:
