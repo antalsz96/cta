@@ -20,3 +20,4 @@ matlab
 *.png
 *.eps
 .DS_Store
+*.json
